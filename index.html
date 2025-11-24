@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Junior Detective Case Generator</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+    <div id="root"></div>
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        
+        const JuniorDetectiveApp = () => {
+          const suspects = [
+            { name: "André", freckles: true, glasses: false, hat: true, braces: true },
+            { name: "Billie", freckles: true, glasses: true, hat: false, braces: true },
+            { name: "David", freckles: false, glasses: false, hat: true, braces: true },
+            { name: "Elani", freckles: true, glasses: false, hat: false, braces: true },
+            { name: "Gupil", freckles: true, glasses: true, hat: true, braces: false },
+            { name: "Maya", freckles: false, glasses: true, hat: false, braces: true },
+            { name: "Miguel", freckles: true, glasses: false, hat: true, braces: false },
+            { name: "Najwa", freckles: true, glasses: true, hat: false, braces: false },
+            { name: "Quentin", freckles: false, glasses: true, hat: true, braces: true },
+            { name: "Scarlett", freckles: false, glasses: true, hat: true, braces: false },
+            { name: "Tobias", freckles: false, glasses: true, hat: true, braces: true },
+            { name: "Wendy", freckles: false, glasses: false, hat: false, braces: true }
+          ];
+
+          const locations = [
+            { name: "School (mascot)", spy: [25, 90, 59] },
+            { name: "Pizza Place (behind boxes)", spy: [83, 62, 31] },
+            { name: "Circus (clown)", spy: [85, 79, 47] },
+            { name: "Library (behind cart)", spy: [94, 73, 12] }
+          ];
+
+          const witnessCards = {
+            "Chip Scoops": [
+              { num: 89, obs: "No freckles" },
+              { num: 64, obs: "Didn't see" },
+              { num: 75, obs: "No hat" },
+              { num: 55, obs: "Didn't see" },
+              { num: 23, obs: "Has glasses" },
+              { num: 40, obs: "Has braces" },
+              { num: 19, obs: "No glasses" },
+              { num: 28, obs: "No braces" },
+              { num: 33, obs: "Has hat" },
+              { num: 13, obs: "Has freckles" }
+            ],
+            "Ferris The Great": [
+              { num: 38, obs: "Didn't see" },
+              { num: 14, obs: "Didn't see" },
+              { num: 41, obs: "No glasses" },
+              { num: 56, obs: "No hat" },
+              { num: 74, obs: "Has glasses" },
+              { num: 29, obs: "Has freckles" },
+              { num: 69, obs: "Has braces" },
+              { num: 82, obs: "No braces" },
+              { num: 20, obs: "No freckles" },
+              { num: 51, obs: "Has hat" }
+            ],
+            "Jackie Russell": [
+              { num: 43, obs: "No braces" },
+              { num: 34, obs: "Has hat" },
+              { num: 27, obs: "Didn't see" },
+              { num: 18, obs: "No glasses" },
+              { num: 57, obs: "Has braces" },
+              { num: 88, obs: "No freckles" },
+              { num: 76, obs: "No hat" },
+              { num: 39, obs: "Has freckles" },
+              { num: 68, obs: "Has glasses" },
+              { num: 49, obs: "Didn't see" }
+            ],
+            "Peppi Roni": [
+              { num: 93, obs: "Has hat" },
+              { num: 60, obs: "No braces" },
+              { num: 36, obs: "Has braces" },
+              { num: 42, obs: "No hat" },
+              { num: 48, obs: "Has glasses" },
+              { num: 17, obs: "Has freckles" },
+              { num: 67, obs: "No glasses" },
+              { num: 52, obs: "Didn't see" },
+              { num: 84, obs: "Didn't see" },
+              { num: 78, obs: "No freckles" }
+            ],
+            "Dottie Drip": [
+              { num: 22, obs: "Didn't see" },
+              { num: 70, obs: "Has glasses" },
+              { num: 37, obs: "Has freckles" },
+              { num: 65, obs: "No hat" },
+              { num: 11, obs: "Has hat" },
+              { num: 46, obs: "No braces" },
+              { num: 91, obs: "Didn't see" },
+              { num: 54, obs: "No glasses" },
+              { num: 81, obs: "No freckles" },
+              { num: 61, obs: "Has braces" }
+            ],
+            "Mr. Sweeps": [
+              { num: 44, obs: "Has hat" },
+              { num: 80, obs: "Didn't see" },
+              { num: 71, obs: "Didn't see" },
+              { num: 86, obs: "Has freckles" },
+              { num: 16, obs: "No hat" },
+              { num: 58, obs: "No freckles" },
+              { num: 30, obs: "No glasses" },
+              { num: 63, obs: "No braces" },
+              { num: 35, obs: "Has glasses" },
+              { num: 26, obs: "Has braces" }
+            ]
+          };
+
+          const mrsWiseCards = [
+            { num: 87, obs: "Ferris The Great is not telling the truth" },
+            { num: 66, obs: "All witnesses are telling the truth" },
+            { num: 53, obs: "All witnesses are telling the truth" },
+            { num: 24, obs: "All witnesses are telling the truth" },
+            { num: 95, obs: "All witnesses are telling the truth" },
+            { num: 15, obs: "Peppi Roni is not telling the truth" },
+            { num: 77, obs: "Mr. Sweeps is not telling the truth" },
+            { num: 32, obs: "All witnesses are telling the truth" },
+            { num: 92, obs: "All witnesses are telling the truth" },
+            { num: 21, obs: "Jackie Russell is not telling the truth" },
+            { num: 45, obs: "Chip Scoops is not telling the truth" },
+            { num: 72, obs: "Dottie Drip is not telling the truth" }
+          ];
+
+          const [currentCase, setCurrentCase] = useState(null);
+          const [showSolution, setShowSolution] = useState(false);
+          const [completedCases, setCompletedCases] = useState(new Set());
+          const [caseNumber, setCaseNumber] = useState(41);
+
+          useEffect(() => {
+            loadCompletedCases();
+          }, []);
+
+          const loadCompletedCases = () => {
+            try {
+              const saved = localStorage.getItem('jr-detective-completed');
+              if (saved) {
+                setCompletedCases(new Set(JSON.parse(saved)));
+              }
+            } catch (error) {
+              console.log('No completed cases yet');
+            }
+          };
+
+          const saveCompletedCases = (cases) => {
+            try {
+              localStorage.setItem('jr-detective-completed', JSON.stringify([...cases]));
+            } catch (error) {
+              console.error('Failed to save:', error);
+            }
+          };
+
+          const getCaseKey = (suspect, location) => {
+            return `${suspect.name}-${location.name}`;
+          };
+
+          const getCharacteristicType = (obs) => {
+            if (obs.includes("freckles")) return "freckles";
+            if (obs.includes("glasses")) return "glasses";
+            if (obs.includes("hat")) return "hat";
+            if (obs.includes("braces")) return "braces";
+            return "none";
+          };
+
+          const generateCaseStory = () => {
+            const cases = [
+              {
+                title: "THE RUBBER DUCKY INVASION",
+                story: "A mysterious prankster has been leaving rubber ducks everywhere around the neighborhood! People keep finding them in the strangest places—on mailboxes, in flower pots, balanced on fence posts. The town is awash with yellow bath toys. Quack the case!"
+              },
+              {
+                title: "THE GREAT BENCH WRAPPING",
+                story: "All the park benches have been gift-wrapped overnight! Each one is covered in colorful paper with big bows on top. The town is baffled by this unusually polite vandal. Time to unwrap this mystery!"
+              },
+              {
+                title: "THE MIXED-UP SIGNS",
+                story: "Someone switched all the street signs to point in random directions! Main Street now points to a cornfield, and Oak Avenue leads to someone's garage. Drivers are confused and the mayor is not amused. Navigate your way to solving this one!"
+              },
+              {
+                title: "THE POLKA DOT CATASTROPHE",
+                story: "Every mailbox on Maple Street is now painted with polka dots! Purple ones, orange ones, even rainbow ones. The Homeowners Association is having a meltdown over the spotted situation. This case is really delivering!"
+              },
+              {
+                title: "THE ALIEN CHALK CHRONICLES",
+                story: "Someone has been leaving mysterious chalk drawings of aliens all over town! Little green beings wave from sidewalks, driveways, and parking lots. Are they messages? Art? A prank? The truth is out there!"
+              },
+              {
+                title: "THE FANCY FELINE FIASCO",
+                story: "The community bulletin board is covered with photos of cats wearing tiny hats! Top hats, sombreros, cowboy hats—every cat in town seems to have gotten a fancy makeover. Who's behind this purrfectly puzzling prank?"
+              },
+              {
+                title: "THE GOOGLY EYE EPIDEMIC",
+                story: "A phantom artist has been secretly adding googly eyes to every statue in town! Historical figures, war memorials, even the fountain cherubs now have wiggly plastic eyes. The historical society is not seeing the funny side. Eye spy a mystery!"
+              },
+              {
+                title: "THE BUBBLE BATH FOUNTAIN",
+                story: "Someone filled the town fountain with bubble bath! Mountains of suds overflow onto the plaza, and ducks are having the time of their lives. Kids are delighted but officials are foaming at the mouth with frustration. This case is really bubbling up!"
+              },
+              {
+                title: "THE ENCOURAGEMENT ENIGMA",
+                story: "Mystery notes have been appearing on random car windshields! 'You're doing great!' 'Nice parking job!' 'Have a wonderful day!' While wholesome, the town still wants to know whodunnit. Kindness is the best clue!"
+              },
+              {
+                title: "THE TINY PARKING PREDICAMENT",
+                story: "All the parking lot lines have been repainted to create miniature parking spots! Each space is now only six inches wide. Only toy cars can fit now, and drivers are having a giant-sized problem. This prankster thinks small!"
+              },
+              {
+                title: "THE GLITTER TRAIL TRICKERY",
+                story: "Someone's been leaving trails of glitter leading to dead ends all over town! Sparkly paths wind through the park, around corners, and up to brick walls. Everyone's shoes are glittery and nobody knows why. Follow the shimmer!"
+              },
+              {
+                title: "THE PASTRY FACE PUZZLER",
+                story: "The local bakery's display window keeps getting rearranged into funny faces! Donuts become eyes, croissants make smiles, and muffins form silly hairdos. The baker finds it amusing but still wants answers. This case is half-baked!"
+              },
+              {
+                title: "THE DAD JOKE DISASTER",
+                story: "Mysterious sticky notes have appeared everywhere with terrible dad jokes written on them! 'What do you call a fake noodle? An impasta!' The groans can be heard throughout the neighborhood. Pun-ish this prankster!"
+              },
+              {
+                title: "THE HUG WARNING MYSTERY",
+                story: "Someone replaced all the 'Beware of Dog' signs with 'Beware of Hugs' signs! Neighbors are confused but oddly comforted by the friendly warnings. The dogs seem disappointed. Embrace the mystery!"
+              },
+              {
+                title: "THE VENDING MACHINE MADNESS",
+                story: "Every vending machine button has been relabeled with silly names! 'Unicorn Tears' instead of water, 'Dragon Chips' instead of regular chips, 'Ninja Cookies' instead of crackers. Snack-tually quite creative!"
+              },
+              {
+                title: "THE COZY TREE CAPER",
+                story: "A crafty culprit has been yarn-bombing trees with colorful knitted sweaters! Oak trees sport striped scarves, maples wear argyle vests, and even bushes have tiny sock warmers. The trees look cozy but the town wants answers. Unravel this mystery!"
+              },
+              {
+                title: "THE DINOSAUR DISCOVERY",
+                story: "Someone's been leaving tiny toy dinosaurs in random spots around town! People keep discovering T-Rexes on their porches, triceratops by trash cans, and pterodactyls perched on playground equipment. This case is prehistorically puzzling!"
+              },
+              {
+                title: "THE BACKWARD DAY BAMBOOZLE",
+                story: "All the 'OPEN' and 'CLOSED' signs in town have been swapped! Stores that are open say they're closed, and closed shops claim to be open. Customers are terribly confused and shop owners are backwards with frustration!"
+              },
+              {
+                title: "THE GARDEN GNOME GATHERING",
+                story: "Dozens of garden gnomes have mysteriously appeared arranged in a circle in the town square! They seem to be having a meeting, complete with tiny plastic chairs. Where did they come from? What are they plotting?"
+              },
+              {
+                title: "THE SOCK SITUATION",
+                story: "Colorful mismatched socks have been tied to every parking meter in town! One striped, one polka-dotted, all proudly flapping in the breeze. Is this a fashion statement or a footwear felony? Put a sock in this case!"
+              }
+            ];
+            
+            return cases[Math.floor(Math.random() * cases.length)];
+          };
+
+          const generateCase = () => {
+            let attempts = 0;
+            const maxAttempts = 100;
+            
+            while (attempts < maxAttempts) {
+              attempts++;
+              
+              const suspect = suspects[Math.floor(Math.random() * suspects.length)];
+              const location = locations[Math.floor(Math.random() * locations.length)];
+              
+              const mrsWise = mrsWiseCards[Math.floor(Math.random() * mrsWiseCards.length)];
+              
+              let lyingWitness = null;
+              if (mrsWise.obs.includes("not telling the truth")) {
+                lyingWitness = mrsWise.obs.split(" is not")[0];
+              }
+              
+              const witnessNames = Object.keys(witnessCards);
+              const selectedWitnesses = [];
+              const usedCharacteristics = new Set();
+              
+              for (const witnessName of witnessNames) {
+                const cards = witnessCards[witnessName];
+                const isLying = witnessName === lyingWitness;
+                
+                const validCards = cards.filter(card => {
+                  if (card.obs === "Didn't see") return true;
+                  
+                  const charType = getCharacteristicType(card.obs);
+                  if (usedCharacteristics.has(charType)) return false;
+                  
+                  const shouldMatch = !isLying;
+                  
+                  if (card.obs === "Has freckles") return suspect.freckles === shouldMatch;
+                  if (card.obs === "No freckles") return !suspect.freckles === shouldMatch;
+                  if (card.obs === "Has glasses") return suspect.glasses === shouldMatch;
+                  if (card.obs === "No glasses") return !suspect.glasses === shouldMatch;
+                  if (card.obs === "Has hat") return suspect.hat === shouldMatch;
+                  if (card.obs === "No hat") return !suspect.hat === shouldMatch;
+                  if (card.obs === "Has braces") return suspect.braces === shouldMatch;
+                  if (card.obs === "No braces") return !suspect.braces === shouldMatch;
+                  
+                  return false;
+                });
+                
+                if (validCards.length > 0) {
+                  const card = validCards[Math.floor(Math.random() * validCards.length)];
+                  const charType = getCharacteristicType(card.obs);
+                  if (charType !== "none") {
+                    usedCharacteristics.add(charType);
+                  }
+                  selectedWitnesses.push({
+                    name: witnessName,
+                    card: card.num,
+                    observation: card.obs
+                  });
+                }
+              }
+              
+              const observedChars = new Set();
+              for (const witness of selectedWitnesses) {
+                const charType = getCharacteristicType(witness.observation);
+                if (charType !== "none") {
+                  observedChars.add(charType);
+                }
+              }
+              
+              if (observedChars.size === 4) {
+                const spyCard = location.spy[Math.floor(Math.random() * location.spy.length)];
+                const caseData = generateCaseStory();
+                
+                setCaseNumber(prev => prev + 1);
+                
+                setCurrentCase({
+                  suspect,
+                  location,
+                  witnesses: selectedWitnesses,
+                  mrsWise,
+                  spyCard,
+                  title: caseData.title,
+                  story: caseData.story,
+                  caseNum: caseNumber + 1
+                });
+                setShowSolution(false);
+                return;
+              }
+            }
+            
+            alert("Couldn't generate a valid case. Please try again!");
+          };
+
+          const markAsCompleted = () => {
+            if (!currentCase) return;
+            const key = getCaseKey(currentCase.suspect, currentCase.location);
+            const newCompleted = new Set(completedCases);
+            newCompleted.add(key);
+            setCompletedCases(newCompleted);
+            saveCompletedCases(newCompleted);
+          };
+
+          const resetProgress = () => {
+            if (window.confirm('Are you sure you want to reset all completed cases?')) {
+              setCompletedCases(new Set());
+              try {
+                localStorage.removeItem('jr-detective-completed');
+              } catch (error) {
+                console.error('Failed to delete:', error);
+              }
+            }
+          };
+
+          const totalCases = suspects.length * locations.length;
+          const completedCount = completedCases.size;
+
+          return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 p-6">
+              <div className="max-w-4xl mx-auto">
+                <div className="bg-white/95 backdrop-blur rounded-xl shadow-2xl p-8">
+                  <h1 className="text-4xl font-bold text-center mb-2 text-indigo-900">
+                    🔍 Junior Detective Case Generator
+                  </h1>
+                  <p className="text-center text-gray-600 mb-6">
+                    Generate unlimited cases for your Junior Detective board game!
+                  </p>
+
+                  <div className="flex justify-between items-center mb-6 p-4 bg-indigo-50 rounded-lg">
+                    <div className="text-sm">
+                      <span className="font-semibold">Progress:</span> {completedCount} / {totalCases} cases
+                    </div>
+                    <button
+                      onClick={resetProgress}
+                      className="flex items-center gap-2 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
+                    >
+                      ↻ Reset
+                    </button>
+                  </div>
+
+                  <div className="flex gap-4 mb-8">
+                    <button
+                      onClick={generateCase}
+                      className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-6 py-4 rounded-lg font-semibold text-lg hover:from-indigo-700 hover:to-purple-700 shadow-lg"
+                    >
+                      🔀 Generate New Case
+                    </button>
+                    {currentCase && (
+                      <button
+                        onClick={markAsCompleted}
+                        className="flex items-center gap-2 bg-green-600 text-white px-6 py-4 rounded-lg font-semibold hover:bg-green-700 shadow-lg"
+                        disabled={completedCases.has(getCaseKey(currentCase.suspect, currentCase.location))}
+                      >
+                        ✓ {completedCases.has(getCaseKey(currentCase.suspect, currentCase.location)) ? 'Done!' : 'Mark Done'}
+                      </button>
+                    )}
+                  </div>
+
+                  {currentCase && (
+                    <div className="space-y-6">
+                      <div className="bg-orange-50 border-2 border-orange-400 rounded-lg p-6">
+                        <div className="flex items-center justify-between mb-2">
+                          <h2 className="text-sm font-semibold text-orange-700">CASE FILE:</h2>
+                          <div className="bg-black text-white px-3 py-1 rounded font-bold text-sm">
+                            JD-{String(currentCase.caseNum).padStart(3, '0')}
+                          </div>
+                        </div>
+                        <h3 className="text-3xl font-bold text-gray-900 mb-4 uppercase">{currentCase.title}</h3>
+                        <div className="bg-white p-4 rounded-lg shadow">
+                          <p className="text-gray-800 leading-relaxed">{currentCase.story}</p>
+                        </div>
+                        <div className="mt-4 p-3 bg-orange-100 rounded border-l-4 border-orange-600">
+                          <p className="font-semibold text-orange-900">Place these cards on the board:</p>
+                        </div>
+                      </div>
+
+                      <div className="bg-yellow-50 border-2 border-yellow-400 rounded-lg p-6">
+                        <h2 className="text-2xl font-bold mb-4 text-indigo-900">Card Setup:</h2>
+                        
+                        <div className="space-y-4">
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <h3 className="font-bold text-lg mb-3 text-indigo-700">Witnesses:</h3>
+                            <div className="grid grid-cols-2 gap-3">
+                              {currentCase.witnesses.map((w, i) => (
+                                <div key={i} className="flex items-center justify-between p-3 bg-indigo-50 rounded border border-indigo-200">
+                                  <span className="font-semibold">{w.name}</span>
+                                  <span className="bg-indigo-600 text-white px-3 py-1 rounded-full font-bold">
+                                    #{w.card}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <h3 className="font-bold text-lg mb-3 text-purple-700">Mrs. Wise:</h3>
+                            <div className="flex items-center justify-between p-3 bg-purple-50 rounded border border-purple-200">
+                              <span className="font-semibold">Mrs. Wise</span>
+                              <span className="bg-purple-600 text-white px-3 py-1 rounded-full font-bold">
+                                #{currentCase.mrsWise.num}
+                              </span>
+                            </div>
+                          </div>
+
+                          <div className="bg-white p-4 rounded-lg shadow">
+                            <h3 className="font-bold text-lg mb-3 text-green-700">The Spy:</h3>
+                            <div className="flex items-center justify-between p-3 bg-green-50 rounded border border-green-200">
+                              <span className="font-semibold">The Spy</span>
+                              <span className="bg-green-600 text-white px-3 py-1 rounded-full font-bold">
+                                #{currentCase.spyCard}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-red-50 to-pink-50 border-2 border-red-400 rounded-lg p-6">
+                        <div className="flex items-center justify-between mb-4">
+                          <h2 className="text-2xl font-bold text-red-900">🎯 Solution</h2>
+                          <button
+                            onClick={() => setShowSolution(!showSolution)}
+                            className="flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                          >
+                            {showSolution ? '👁️‍🗨️ Hide' : '👁️ Show'}
+                          </button>
+                        </div>
+                        
+                        {showSolution && (
+                          <div className="space-y-3">
+                            <div className="bg-white p-4 rounded-lg">
+                              <div className="font-bold text-lg text-indigo-900">Culprit: {currentCase.suspect.name}</div>
+                              <div className="text-sm text-gray-600 mt-2">
+                                {currentCase.suspect.freckles && '✓ Freckles '}
+                                {currentCase.suspect.glasses && '✓ Glasses '}
+                                {currentCase.suspect.hat && '✓ Hat '}
+                                {currentCase.suspect.braces && '✓ Braces'}
+                              </div>
+                            </div>
+                            <div className="bg-white p-4 rounded-lg">
+                              <div className="font-bold text-lg text-green-900">Location: {currentCase.location.name}</div>
+                            </div>
+                            <div className="bg-white p-4 rounded-lg">
+                              <div className="font-bold mb-2 text-purple-900">What the witnesses say:</div>
+                              <div className="space-y-1 text-sm">
+                                {currentCase.witnesses.map((w, i) => (
+                                  <div key={i}>• {w.name}: {w.observation}</div>
+                                ))}
+                                <div className="font-semibold mt-2">• Mrs. Wise: {currentCase.mrsWise.obs}</div>
+                              </div>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {!currentCase && (
+                    <div className="text-center py-12 text-gray-500">
+                      <p className="text-xl">Click "Generate New Case" to start!</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        ReactDOM.render(<JuniorDetectiveApp />, document.getElementById('root'));
+    </script>
+</body>
+</html>
